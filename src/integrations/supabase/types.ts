@@ -14,7 +14,138 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      categories: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          type: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          type: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          type?: string
+        }
+        Relationships: []
+      }
+      profile_assets: {
+        Row: {
+          category_id: string
+          created_at: string | null
+          description: string
+          id: string
+          profile_id: string
+        }
+        Insert: {
+          category_id: string
+          created_at?: string | null
+          description: string
+          id?: string
+          profile_id: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string | null
+          description?: string
+          id?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_assets_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_assets_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profile_needs: {
+        Row: {
+          category_id: string
+          created_at: string | null
+          description: string
+          id: string
+          profile_id: string
+        }
+        Insert: {
+          category_id: string
+          created_at?: string | null
+          description: string
+          id?: string
+          profile_id: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string | null
+          description?: string
+          id?: string
+          profile_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_needs_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_needs_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          age: number | null
+          bio: string | null
+          created_at: string | null
+          full_name: string
+          id: string
+          updated_at: string | null
+          user_id: string
+          user_type: Database["public"]["Enums"]["user_type"]
+        }
+        Insert: {
+          age?: number | null
+          bio?: string | null
+          created_at?: string | null
+          full_name: string
+          id?: string
+          updated_at?: string | null
+          user_id: string
+          user_type: Database["public"]["Enums"]["user_type"]
+        }
+        Update: {
+          age?: number | null
+          bio?: string | null
+          created_at?: string | null
+          full_name?: string
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+          user_type?: Database["public"]["Enums"]["user_type"]
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +154,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      user_type: "youth" | "senior"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +281,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_type: ["youth", "senior"],
+    },
   },
 } as const
