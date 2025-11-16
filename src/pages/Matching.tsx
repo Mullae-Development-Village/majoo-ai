@@ -184,7 +184,7 @@ const Matching = () => {
             </Link>
             <div>
               <h1 className="text-3xl md:text-4xl font-bold">
-                {currentProfile?.user_type === "youth" ? "시니어 멘토 파트너들" : "청년 멘토 파트너들"}
+                {currentProfile?.user_type === "youth" ? "시니어 파트너들" : "청년 파트너들"}
               </h1>
               <p className="text-muted-foreground mt-1">
                 매칭도가 높을수록 서로의 니즈가 잘 맞아떨어집니다

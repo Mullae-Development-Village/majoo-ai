@@ -213,11 +213,9 @@ const Onboarding = () => {
                 >
                   <CardContent className="p-6 text-center space-y-4">
                     <div className="text-5xl">😮</div>
-                    <h3 className="text-xl font-bold">청년 멘토로 가입</h3>
+                    <h3 className="text-xl font-bold">청년 프로필 가입</h3>
                     <p className="text-sm text-muted-foreground">
-                      청년님들은 "도움이 필요한 존재"가 아니에요.
-                      <br />
-                      청년님들도 시니어에게 나눌 수 있는 게 있어요!
+                      청년 프로필로 시작합니다
                     </p>
                   </CardContent>
                 </Card>
@@ -230,11 +228,9 @@ const Onboarding = () => {
                 >
                   <CardContent className="p-6 text-center space-y-4">
                     <div className="text-5xl">👨</div>
-                    <h3 className="text-xl font-bold">시니어 멘토로 가입</h3>
+                    <h3 className="text-xl font-bold">시니어 프로필 가입</h3>
                     <p className="text-sm text-muted-foreground">
-                      시니어님들도 청년에게 배울 수 있어요.
-                      <br />
-                      청년님들과 동등한 입장에서 교류해요!
+                      시니어 프로필로 시작합니다
                     </p>
                   </CardContent>
                 </Card>
