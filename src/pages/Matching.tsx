@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, MessageCircle, User, Loader2 } from "lucide-react";
+import { ArrowLeft, MessageCircle, User, Loader2, LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -159,6 +159,11 @@ const Matching = () => {
     return Math.round((score / (maxScore || 1)) * 100);
   };
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/auth");
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
@@ -176,20 +181,26 @@ const Matching = () => {
       <div className="container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-5xl mx-auto space-y-8">
           {/* Header */}
-          <div className="flex items-center gap-4 animate-fade-in">
-            <Link to="/">
-              <Button variant="ghost" size="icon">
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-            </Link>
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold">
-                {currentProfile?.user_type === "youth" ? "시니어 파트너들" : "청년 파트너들"}
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                매칭도가 높을수록 서로의 니즈가 잘 맞아떨어집니다
-              </p>
+          <div className="flex items-center justify-between animate-fade-in">
+            <div className="flex items-center gap-4">
+              <Link to="/">
+                <Button variant="ghost" size="icon">
+                  <ArrowLeft className="w-5 h-5" />
+                </Button>
+              </Link>
+              <div>
+                <h1 className="text-3xl md:text-4xl font-bold">
+                  {currentProfile?.user_type === "youth" ? "시니어 파트너들" : "청년 파트너들"}
+                </h1>
+                <p className="text-muted-foreground mt-1">
+                  매칭도가 높을수록 서로의 니즈가 잘 맞아떨어집니다
+                </p>
+              </div>
             </div>
+            <Button variant="outline" onClick={handleLogout} className="gap-2">
+              <LogOut className="w-4 h-4" />
+              로그아웃
+            </Button>
           </div>
 
           {/* Current Profile Info */}
@@ -197,7 +208,7 @@ const Matching = () => {
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
                 <div className="text-3xl">
-                  {currentProfile?.user_type === "youth" ? "📚" : "🎁"}
+                  {currentProfile?.user_type === "youth" ? "🧑" : "👴"}
                 </div>
                 <div className="flex-1">
                   <h3 className="font-bold text-lg mb-2">
@@ -205,7 +216,7 @@ const Matching = () => {
                   </h3>
                   <div className="grid md:grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p className="font-medium text-secondary mb-1">🎁 나눌 수 있는 것</p>
+                      <p className="font-medium text-secondary mb-1">💡 나눌 수 있는 것</p>
                       <ul className="space-y-1 text-muted-foreground">
                         {currentProfile?.assets.slice(0, 3).map((asset, i) => (
                           <li key={i}>• {asset.category_name}</li>
@@ -213,7 +224,7 @@ const Matching = () => {
                       </ul>
                     </div>
                     <div>
-                      <p className="font-medium text-accent-foreground mb-1">📚 배우고 싶은 것</p>
+                      <p className="font-medium text-accent-foreground mb-1">🎯 배우고 싶은 것</p>
                       <ul className="space-y-1 text-muted-foreground">
                         {currentProfile?.needs.slice(0, 3).map((need, i) => (
                           <li key={i}>• {need.category_name}</li>
@@ -271,7 +282,7 @@ const Matching = () => {
                     )}
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="p-4 bg-secondary/10 rounded-lg border border-secondary/20">
-                        <p className="text-xs font-medium text-secondary mb-2">🎁 나눌 수 있는 것</p>
+                        <p className="text-xs font-medium text-secondary mb-2">💡 나눌 수 있는 것</p>
                         <div className="space-y-1">
                           {match.assets.slice(0, 3).map((asset, i) => (
                             <div key={i}>
@@ -284,7 +295,7 @@ const Matching = () => {
                         </div>
                       </div>
                       <div className="p-4 bg-accent/10 rounded-lg border border-accent/20">
-                        <p className="text-xs font-medium text-accent-foreground mb-2">📚 배우고 싶은 것</p>
+                        <p className="text-xs font-medium text-accent-foreground mb-2">🎯 배우고 싶은 것</p>
                         <div className="space-y-1">
                           {match.needs.slice(0, 3).map((need, i) => (
                             <div key={i}>
