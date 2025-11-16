@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, MessageCircle, User, Loader2, LogOut } from "lucide-react";
+import { ArrowLeft, MessageCircle, User, Loader2, LogOut, Settings } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -211,25 +211,43 @@ const Matching = () => {
                   {currentProfile?.user_type === "youth" ? "🧑" : "👴"}
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-bold text-lg mb-2">
-                    {currentProfile?.full_name}님의 프로필
-                  </h3>
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-bold text-lg">
+                      {currentProfile?.full_name}님의 프로필
+                    </h3>
+                    <Link to="/profile/edit">
+                      <Button variant="outline" size="sm" className="gap-2">
+                        <Settings className="w-4 h-4" />
+                        수정
+                      </Button>
+                    </Link>
+                  </div>
                   <div className="grid md:grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p className="font-medium text-secondary mb-1">💡 나눌 수 있는 것</p>
-                      <ul className="space-y-1 text-muted-foreground">
+                      <p className="font-medium text-secondary mb-2">💡 나눌 수 있는 것</p>
+                      <div className="space-y-2">
                         {currentProfile?.assets.slice(0, 3).map((asset, i) => (
-                          <li key={i}>• {asset.category_name}</li>
+                          <div key={i} className="text-muted-foreground">
+                            • {asset.description}
+                          </div>
                         ))}
-                      </ul>
+                        {currentProfile?.assets.length === 0 && (
+                          <p className="text-muted-foreground text-xs">아직 추가하지 않았습니다</p>
+                        )}
+                      </div>
                     </div>
                     <div>
-                      <p className="font-medium text-accent-foreground mb-1">🎯 배우고 싶은 것</p>
-                      <ul className="space-y-1 text-muted-foreground">
+                      <p className="font-medium text-accent-foreground mb-2">🎯 배우고 싶은 것</p>
+                      <div className="space-y-2">
                         {currentProfile?.needs.slice(0, 3).map((need, i) => (
-                          <li key={i}>• {need.category_name}</li>
+                          <div key={i} className="text-muted-foreground">
+                            • {need.description}
+                          </div>
                         ))}
-                      </ul>
+                        {currentProfile?.needs.length === 0 && (
+                          <p className="text-muted-foreground text-xs">아직 추가하지 않았습니다</p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
