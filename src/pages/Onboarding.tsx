@@ -5,17 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, ArrowRight } from "lucide-react";
+import { Loader2, ArrowRight, Plus, X } from "lucide-react";
 
 type UserType = "youth" | "senior";
-type Category = {
-  id: string;
-  name: string;
-  type: string;
-};
 
 const Onboarding = () => {
   const navigate = useNavigate();
@@ -32,12 +26,11 @@ const Onboarding = () => {
   const [age, setAge] = useState("");
   const [bio, setBio] = useState("");
   
-  // Step 3: Assets & Needs
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedAssets, setSelectedAssets] = useState<Set<string>>(new Set());
-  const [selectedNeeds, setSelectedNeeds] = useState<Set<string>>(new Set());
-  const [assetDescriptions, setAssetDescriptions] = useState<Record<string, string>>({});
-  const [needDescriptions, setNeedDescriptions] = useState<Record<string, string>>({});
+  // Step 3: Assets & Needs - new approach with free text input
+  const [assets, setAssets] = useState<Array<{ id: string; description: string }>>([]);
+  const [needs, setNeeds] = useState<Array<{ id: string; description: string }>>([]);
+  const [currentAssetInput, setCurrentAssetInput] = useState("");
+  const [currentNeedInput, setCurrentNeedInput] = useState("");
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
@@ -60,20 +53,6 @@ const Onboarding = () => {
         navigate("/matching");
       }
     });
-
-    // Load categories
-    const loadCategories = async () => {
-      const { data, error } = await supabase
-        .from("categories")
-        .select("*")
-        .order("name");
-        
-      if (!error && data) {
-        setCategories(data);
-      }
-    };
-    
-    loadCategories();
   }, [navigate]);
 
   const handleNext = () => {
@@ -96,11 +75,55 @@ const Onboarding = () => {
     setStep(step + 1);
   };
 
-  const handleComplete = async () => {
-    if (selectedAssets.size === 0 || selectedNeeds.size === 0) {
+  const addAsset = () => {
+    if (!currentAssetInput.trim()) {
       toast({
-        title: "최소 1개 이상 선택해주세요",
-        description: "나눌 수 있는 것과 배우고 싶은 것을 각각 선택해주세요.",
+        title: "내용을 입력해주세요",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const newAsset = {
+      id: Date.now().toString(),
+      description: currentAssetInput.trim(),
+    };
+
+    setAssets([...assets, newAsset]);
+    setCurrentAssetInput("");
+  };
+
+  const removeAsset = (id: string) => {
+    setAssets(assets.filter((asset) => asset.id !== id));
+  };
+
+  const addNeed = () => {
+    if (!currentNeedInput.trim()) {
+      toast({
+        title: "내용을 입력해주세요",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const newNeed = {
+      id: Date.now().toString(),
+      description: currentNeedInput.trim(),
+    };
+
+    setNeeds([...needs, newNeed]);
+    setCurrentNeedInput("");
+  };
+
+  const removeNeed = (id: string) => {
+    setNeeds(needs.filter((need) => need.id !== id));
+  };
+
+  const handleComplete = async () => {
+    if (assets.length === 0 || needs.length === 0) {
+      toast({
+        title: "최소 1개 이상 추가해주세요",
+        description: "나눌 수 있는 것과 배우고 싶은 것을 각각 추가해주세요.",
         variant: "destructive",
       });
       return;
@@ -124,22 +147,64 @@ const Onboarding = () => {
 
       if (profileError) throw profileError;
 
-      // Insert assets
-      for (const categoryId of Array.from(selectedAssets)) {
-        await supabase.from("profile_assets").insert({
-          profile_id: profile.id,
-          category_id: categoryId,
-          description: assetDescriptions[categoryId] || "",
-        });
+      // For assets and needs, we'll create a generic category or store as text
+      // Since we're moving away from predefined categories, let's create them dynamically
+      for (const asset of assets) {
+        // Find or create category
+        const { data: existingCategory } = await supabase
+          .from("categories")
+          .select("id")
+          .eq("name", asset.description)
+          .maybeSingle();
+
+        let categoryId;
+        if (existingCategory) {
+          categoryId = existingCategory.id;
+        } else {
+          const { data: newCategory } = await supabase
+            .from("categories")
+            .insert({ name: asset.description, type: "custom" })
+            .select("id")
+            .single();
+          categoryId = newCategory?.id;
+        }
+
+        if (categoryId) {
+          await supabase.from("profile_assets").insert({
+            profile_id: profile.id,
+            category_id: categoryId,
+            description: asset.description,
+          });
+        }
       }
 
-      // Insert needs
-      for (const categoryId of Array.from(selectedNeeds)) {
-        await supabase.from("profile_needs").insert({
-          profile_id: profile.id,
-          category_id: categoryId,
-          description: needDescriptions[categoryId] || "",
-        });
+      for (const need of needs) {
+        // Find or create category
+        const { data: existingCategory } = await supabase
+          .from("categories")
+          .select("id")
+          .eq("name", need.description)
+          .maybeSingle();
+
+        let categoryId;
+        if (existingCategory) {
+          categoryId = existingCategory.id;
+        } else {
+          const { data: newCategory } = await supabase
+            .from("categories")
+            .insert({ name: need.description, type: "custom" })
+            .select("id")
+            .single();
+          categoryId = newCategory?.id;
+        }
+
+        if (categoryId) {
+          await supabase.from("profile_needs").insert({
+            profile_id: profile.id,
+            category_id: categoryId,
+            description: need.description,
+          });
+        }
       }
 
       toast({
@@ -157,26 +222,6 @@ const Onboarding = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const toggleAsset = (categoryId: string) => {
-    const newSet = new Set(selectedAssets);
-    if (newSet.has(categoryId)) {
-      newSet.delete(categoryId);
-    } else {
-      newSet.add(categoryId);
-    }
-    setSelectedAssets(newSet);
-  };
-
-  const toggleNeed = (categoryId: string) => {
-    const newSet = new Set(selectedNeeds);
-    if (newSet.has(categoryId)) {
-      newSet.delete(categoryId);
-    } else {
-      newSet.add(categoryId);
-    }
-    setSelectedNeeds(newSet);
   };
 
   return (
@@ -212,7 +257,7 @@ const Onboarding = () => {
                   onClick={() => setUserType("youth")}
                 >
                   <CardContent className="p-6 text-center space-y-4">
-                    <div className="text-5xl">😮</div>
+                    <div className="text-5xl">📚</div>
                     <h3 className="text-xl font-bold">청년 프로필 가입</h3>
                     <p className="text-sm text-muted-foreground">
                       청년 프로필로 시작합니다
@@ -227,7 +272,7 @@ const Onboarding = () => {
                   onClick={() => setUserType("senior")}
                 >
                   <CardContent className="p-6 text-center space-y-4">
-                    <div className="text-5xl">👨</div>
+                    <div className="text-5xl">🎁</div>
                     <h3 className="text-xl font-bold">시니어 프로필 가입</h3>
                     <p className="text-sm text-muted-foreground">
                       시니어 프로필로 시작합니다
@@ -301,83 +346,103 @@ const Onboarding = () => {
           <div className="space-y-6 animate-fade-in">
             <Card className="shadow-card">
               <CardHeader>
-                <CardTitle className="text-2xl">👨 내가 나눌 수 있는 것</CardTitle>
+                <CardTitle className="text-2xl flex items-center gap-2">
+                  <span className="text-3xl">🎁</span>
+                  내가 나눌 수 있는 것
+                </CardTitle>
                 <p className="text-muted-foreground">
-                  자신있거나 남에게 나눠줄 수 있는 것을 선택하세요
+                  자신있거나 남에게 나눠줄 수 있는 것을 추가하세요
                 </p>
               </CardHeader>
               <CardContent className="space-y-4">
-                {categories.map((category) => (
-                  <div key={category.id} className="space-y-2">
-                    <div className="flex items-center gap-3">
-                      <Checkbox
-                        id={`asset-${category.id}`}
-                        checked={selectedAssets.has(category.id)}
-                        onCheckedChange={() => toggleAsset(category.id)}
-                      />
-                      <Label
-                        htmlFor={`asset-${category.id}`}
-                        className="cursor-pointer font-medium"
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="예: 50년 노하우의 김치 담그는 비법"
+                    value={currentAssetInput}
+                    onChange={(e) => setCurrentAssetInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addAsset();
+                      }
+                    }}
+                  />
+                  <Button onClick={addAsset} type="button">
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+
+                {assets.length > 0 && (
+                  <div className="space-y-2">
+                    {assets.map((asset) => (
+                      <div
+                        key={asset.id}
+                        className="flex items-center justify-between p-3 bg-secondary/10 rounded-lg border border-secondary/20"
                       >
-                        {category.name}
-                      </Label>
-                    </div>
-                    {selectedAssets.has(category.id) && (
-                      <Input
-                        placeholder="상세 설명 (예: 50년 노하우의 김치 담그는 비법)"
-                        value={assetDescriptions[category.id] || ""}
-                        onChange={(e) =>
-                          setAssetDescriptions({
-                            ...assetDescriptions,
-                            [category.id]: e.target.value,
-                          })
-                        }
-                        className="ml-9"
-                      />
-                    )}
+                        <p className="text-sm flex-1">{asset.description}</p>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeAsset(asset.id)}
+                          type="button"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
               </CardContent>
             </Card>
 
             <Card className="shadow-card">
               <CardHeader>
-                <CardTitle className="text-2xl">😮 내가 배우고 싶은 것</CardTitle>
+                <CardTitle className="text-2xl flex items-center gap-2">
+                  <span className="text-3xl">📚</span>
+                  내가 배우고 싶은 것
+                </CardTitle>
                 <p className="text-muted-foreground">
-                  도움이 필요하거나 배우고 싶은 것을 선택하세요
+                  도움이 필요하거나 배우고 싶은 것을 추가하세요
                 </p>
               </CardHeader>
               <CardContent className="space-y-4">
-                {categories.map((category) => (
-                  <div key={category.id} className="space-y-2">
-                    <div className="flex items-center gap-3">
-                      <Checkbox
-                        id={`need-${category.id}`}
-                        checked={selectedNeeds.has(category.id)}
-                        onCheckedChange={() => toggleNeed(category.id)}
-                      />
-                      <Label
-                        htmlFor={`need-${category.id}`}
-                        className="cursor-pointer font-medium"
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="예: 유튜브 섬네일 만드는 법"
+                    value={currentNeedInput}
+                    onChange={(e) => setCurrentNeedInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addNeed();
+                      }
+                    }}
+                  />
+                  <Button onClick={addNeed} type="button">
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+
+                {needs.length > 0 && (
+                  <div className="space-y-2">
+                    {needs.map((need) => (
+                      <div
+                        key={need.id}
+                        className="flex items-center justify-between p-3 bg-accent/10 rounded-lg border border-accent/20"
                       >
-                        {category.name}
-                      </Label>
-                    </div>
-                    {selectedNeeds.has(category.id) && (
-                      <Input
-                        placeholder="상세 설명 (예: 유튜브 섬네일 만드는 법)"
-                        value={needDescriptions[category.id] || ""}
-                        onChange={(e) =>
-                          setNeedDescriptions({
-                            ...needDescriptions,
-                            [category.id]: e.target.value,
-                          })
-                        }
-                        className="ml-9"
-                      />
-                    )}
+                        <p className="text-sm flex-1">{need.description}</p>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeNeed(need.id)}
+                          type="button"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
               </CardContent>
             </Card>
 

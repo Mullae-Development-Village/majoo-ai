@@ -23,7 +23,7 @@ const Profiles = () => {
               <Link to="/matching?type=learn">
                 <CardContent className="p-8 space-y-6">
                   <div className="text-center space-y-4">
-                    <div className="text-6xl">😮</div>
+                    <div className="text-6xl">📚</div>
                     <h2 className="text-2xl font-bold">배울래요</h2>
                     <p className="text-muted-foreground">
                       내가 현재 배우고 싶은 것
@@ -54,7 +54,7 @@ const Profiles = () => {
               <Link to="/matching?type=share">
                 <CardContent className="p-8 space-y-6">
                   <div className="text-center space-y-4">
-                    <div className="text-6xl">👨</div>
+                    <div className="text-6xl">🎁</div>
                     <h2 className="text-2xl font-bold">나눌게요</h2>
                     <p className="text-muted-foreground">
                       내가 자신 있거나 남에게 나눌 수 있는 것
