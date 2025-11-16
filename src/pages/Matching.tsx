@@ -197,7 +197,7 @@ const Matching = () => {
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
                 <div className="text-3xl">
-                  {currentProfile?.user_type === "youth" ? "😮" : "👨"}
+                  {currentProfile?.user_type === "youth" ? "📚" : "🎁"}
                 </div>
                 <div className="flex-1">
                   <h3 className="font-bold text-lg mb-2">
@@ -205,7 +205,7 @@ const Matching = () => {
                   </h3>
                   <div className="grid md:grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p className="font-medium text-secondary mb-1">👨 나눌 수 있는 것</p>
+                      <p className="font-medium text-secondary mb-1">🎁 나눌 수 있는 것</p>
                       <ul className="space-y-1 text-muted-foreground">
                         {currentProfile?.assets.slice(0, 3).map((asset, i) => (
                           <li key={i}>• {asset.category_name}</li>
@@ -213,7 +213,7 @@ const Matching = () => {
                       </ul>
                     </div>
                     <div>
-                      <p className="font-medium text-accent-foreground mb-1">😮 배우고 싶은 것</p>
+                      <p className="font-medium text-accent-foreground mb-1">📚 배우고 싶은 것</p>
                       <ul className="space-y-1 text-muted-foreground">
                         {currentProfile?.needs.slice(0, 3).map((need, i) => (
                           <li key={i}>• {need.category_name}</li>
@@ -271,7 +271,7 @@ const Matching = () => {
                     )}
                     <div className="grid md:grid-cols-2 gap-4">
                       <div className="p-4 bg-secondary/10 rounded-lg border border-secondary/20">
-                        <p className="text-xs font-medium text-secondary mb-2">👨 나눌 수 있는 것</p>
+                        <p className="text-xs font-medium text-secondary mb-2">🎁 나눌 수 있는 것</p>
                         <div className="space-y-1">
                           {match.assets.slice(0, 3).map((asset, i) => (
                             <div key={i}>
@@ -284,7 +284,7 @@ const Matching = () => {
                         </div>
                       </div>
                       <div className="p-4 bg-accent/10 rounded-lg border border-accent/20">
-                        <p className="text-xs font-medium text-accent-foreground mb-2">😮 배우고 싶은 것</p>
+                        <p className="text-xs font-medium text-accent-foreground mb-2">📚 배우고 싶은 것</p>
                         <div className="space-y-1">
                           {match.needs.slice(0, 3).map((need, i) => (
                             <div key={i}>
