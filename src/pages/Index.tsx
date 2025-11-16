@@ -30,7 +30,7 @@ const Index = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Link to="/profiles">
+            <Link to="/auth">
               <Button size="lg" className="text-lg px-8 py-6 shadow-soft hover:shadow-lg transition-all">
                 시작하기
                 <ArrowRight className="ml-2 w-5 h-5" />
@@ -96,7 +96,7 @@ const Index = () => {
               <br />
               완벽한 교환 파트너를 만나보세요
             </p>
-            <Link to="/profiles">
+            <Link to="/auth">
               <Button size="lg" variant="secondary" className="text-lg px-8 py-6 mt-4">
                 프로필 만들기
                 <ArrowRight className="ml-2 w-5 h-5" />
