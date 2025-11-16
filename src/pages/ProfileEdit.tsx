@@ -151,7 +151,7 @@ const ProfileEdit = () => {
         .from("profile_assets")
         .insert({
           profile_id: profileId,
-          category_id: "00000000-0000-0000-0000-000000000000", // dummy category
+          category_id: null,
           description: newAsset,
         })
         .select()
@@ -210,7 +210,7 @@ const ProfileEdit = () => {
         .from("profile_needs")
         .insert({
           profile_id: profileId,
-          category_id: "00000000-0000-0000-0000-000000000000", // dummy category
+          category_id: null,
           description: newNeed,
         })
         .select()
