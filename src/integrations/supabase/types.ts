@@ -37,21 +37,21 @@ export type Database = {
       }
       profile_assets: {
         Row: {
-          category_id: string
+          category_id: string | null
           created_at: string | null
           description: string
           id: string
           profile_id: string
         }
         Insert: {
-          category_id: string
+          category_id?: string | null
           created_at?: string | null
           description: string
           id?: string
           profile_id: string
         }
         Update: {
-          category_id?: string
+          category_id?: string | null
           created_at?: string | null
           description?: string
           id?: string
@@ -76,21 +76,21 @@ export type Database = {
       }
       profile_needs: {
         Row: {
-          category_id: string
+          category_id: string | null
           created_at: string | null
           description: string
           id: string
           profile_id: string
         }
         Insert: {
-          category_id: string
+          category_id?: string | null
           created_at?: string | null
           description: string
           id?: string
           profile_id: string
         }
         Update: {
-          category_id?: string
+          category_id?: string | null
           created_at?: string | null
           description?: string
           id?: string
