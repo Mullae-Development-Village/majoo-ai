@@ -257,7 +257,7 @@ const Onboarding = () => {
                   onClick={() => setUserType("youth")}
                 >
                   <CardContent className="p-6 text-center space-y-4">
-                    <div className="text-5xl">📚</div>
+                    <div className="text-5xl">🧑</div>
                     <h3 className="text-xl font-bold">청년 프로필 가입</h3>
                     <p className="text-sm text-muted-foreground">
                       청년 프로필로 시작합니다
@@ -272,7 +272,7 @@ const Onboarding = () => {
                   onClick={() => setUserType("senior")}
                 >
                   <CardContent className="p-6 text-center space-y-4">
-                    <div className="text-5xl">🎁</div>
+                    <div className="text-5xl">👴</div>
                     <h3 className="text-xl font-bold">시니어 프로필 가입</h3>
                     <p className="text-sm text-muted-foreground">
                       시니어 프로필로 시작합니다
@@ -347,7 +347,7 @@ const Onboarding = () => {
             <Card className="shadow-card">
               <CardHeader>
                 <CardTitle className="text-2xl flex items-center gap-2">
-                  <span className="text-3xl">🎁</span>
+                  <span className="text-3xl">💡</span>
                   내가 나눌 수 있는 것
                 </CardTitle>
                 <p className="text-muted-foreground">
@@ -398,7 +398,7 @@ const Onboarding = () => {
             <Card className="shadow-card">
               <CardHeader>
                 <CardTitle className="text-2xl flex items-center gap-2">
-                  <span className="text-3xl">📚</span>
+                  <span className="text-3xl">🎯</span>
                   내가 배우고 싶은 것
                 </CardTitle>
                 <p className="text-muted-foreground">
