@@ -38,6 +38,7 @@ const ProfileEdit = () => {
   const [needs, setNeeds] = useState<Array<{ id?: string; description: string }>>([]);
   const [newAsset, setNewAsset] = useState("");
   const [newNeed, setNewNeed] = useState("");
+  const [seeding, setSeeding] = useState(false);
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -261,6 +262,40 @@ const ProfileEdit = () => {
     setNeeds(needs.filter((_, i) => i !== index));
   };
 
+  const seedDummyUsers = async () => {
+    setSeeding(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({
+          title: "인증 필요",
+          description: "로그인이 필요합니다.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const response = await supabase.functions.invoke("seed-users", {
+        method: "POST",
+      });
+
+      if (response.error) throw response.error;
+
+      toast({
+        title: "생성 완료",
+        description: response.data.message || "15명의 더미 사용자가 생성되었습니다.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "생성 실패",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSeeding(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
@@ -439,6 +474,26 @@ const ProfileEdit = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Developer Tool */}
+          <div className="flex justify-center">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={seedDummyUsers}
+              disabled={seeding}
+              className="text-xs"
+            >
+              {seeding ? (
+                <>
+                  <Loader2 className="w-3 h-3 mr-2 animate-spin" />
+                  생성 중...
+                </>
+              ) : (
+                "더미 사용자 15명 생성"
+              )}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
