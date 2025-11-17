@@ -7,6 +7,22 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { z } from "zod";
+
+const authSchema = z.object({
+  email: z.string()
+    .trim()
+    .email("올바른 이메일 형식이 아닙니다")
+    .max(255, "이메일은 255자를 초과할 수 없습니다"),
+  password: z.string()
+    .min(8, "비밀번호는 최소 8자 이상이어야 합니다")
+    .max(128, "비밀번호는 128자를 초과할 수 없습니다"),
+  fullName: z.string()
+    .trim()
+    .min(2, "이름은 최소 2자 이상이어야 합니다")
+    .max(100, "이름은 100자를 초과할 수 없습니다")
+    .optional(),
+});
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -38,10 +54,30 @@ const Auth = () => {
     setLoading(true);
 
     try {
+      // Validate inputs
+      const validationData = {
+        email: email.trim(),
+        password,
+        ...(isLogin ? {} : { fullName: fullName.trim() }),
+      };
+
+      const result = authSchema.safeParse(validationData);
+      
+      if (!result.success) {
+        const firstError = result.error.errors[0];
+        toast({
+          title: "입력 오류",
+          description: firstError.message,
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
+          email: result.data.email,
+          password: result.data.password,
         });
 
         if (error) throw error;
@@ -51,7 +87,7 @@ const Auth = () => {
           description: "환영합니다!",
         });
       } else {
-        if (!fullName) {
+        if (!result.data.fullName) {
           toast({
             title: "이름을 입력해주세요",
             variant: "destructive",
@@ -61,12 +97,12 @@ const Auth = () => {
         }
 
         const { error } = await supabase.auth.signUp({
-          email,
-          password,
+          email: result.data.email,
+          password: result.data.password,
           options: {
             emailRedirectTo: `${window.location.origin}/onboarding`,
             data: {
-              full_name: fullName,
+              full_name: result.data.fullName,
             },
           },
         });
